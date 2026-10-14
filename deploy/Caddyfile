@@ -1,0 +1,24 @@
+{$DOMAIN} {
+	tls {
+		protocols tls1.3
+	}
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# handle blocks are mutually exclusive and run in order, unlike bare directives,
+	# where Caddy's built-in ordering runs `respond` before `reverse_proxy`.
+	@backend path /api/* /ws/* /health
+	handle @backend {
+		reverse_proxy api:8080 {
+			header_up X-Request-ID {http.request.uuid}
+		}
+	}
+	handle {
+		respond 404
+	}
+}

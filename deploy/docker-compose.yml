@@ -1,0 +1,105 @@
+# Single-VPS deployment (8GB RAM). Usage from the repo root:
+#   cp deploy/.env.example deploy/.env   # then fill in the values
+#   docker compose -f deploy/docker-compose.yml up -d --build
+name: pharmachat
+
+x-service-env: &service-env
+  APP_ENV: ${APP_ENV:-production}
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  DATABASE_URL: postgres://pharmachat_api:${APP_DB_PASSWORD}@postgres:5432/pharmachat?sslmode=disable
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    mem_limit: 2g
+    command: ["postgres", "-c", "shared_buffers=512MB", "-c", "max_connections=100"]
+    environment:
+      POSTGRES_DB: pharmachat
+      POSTGRES_USER: pharmachat_owner
+      POSTGRES_PASSWORD: ${OWNER_DB_PASSWORD:?set OWNER_DB_PASSWORD in deploy/.env}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?set APP_DB_PASSWORD in deploy/.env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/10-app-role.sql:/docker-entrypoint-initdb.d/10-app-role.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pharmachat_owner -d pharmachat"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # One-shot: applies migrations, then exits. Also the image for `pcctl seed` and
+  # `pcctl create-admin` via `docker compose run --rm pcctl <command>`.
+  pcctl:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args: { SERVICE: pcctl }
+    image: pharmachat/pcctl:local
+    command: ["migrate", "up"]
+    restart: "no"
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_ADMIN_URL: postgres://pharmachat_owner:${OWNER_DB_PASSWORD}@postgres:5432/pharmachat?sslmode=disable
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args: { SERVICE: api }
+    image: pharmachat/api:local
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      <<: *service-env
+    depends_on:
+      pcctl: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "/app", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  agent:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args: { SERVICE: agent }
+    image: pharmachat/agent:local
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      <<: *service-env
+    depends_on:
+      pcctl: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "/app", "healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2.10.2
+    restart: unless-stopped
+    mem_limit: 128m
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
