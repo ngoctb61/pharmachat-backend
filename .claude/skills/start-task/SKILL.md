@@ -24,4 +24,4 @@ description: Bắt đầu một task GO-xx của kế hoạch PharmaChat (ví d�
 6. **Hoàn tất**:
    - Đổi task thành `done` trong `.sdd/TASKS.md`, ghi chú bằng chứng ngắn (test nào chứng minh điều kiện xong).
    - Commit theo conventional commits, có mã task trong tiêu đề hoặc thân.
-   - Push nhánh (không push `master`) và đề xuất mở PR với mô tả: task, SPEC, cách kiểm chứng. Chỉ tạo PR khi người dùng đồng ý.
+   - Push nhánh (không push `master`) và soạn mô tả PR theo `.github/pull_request_template.md`: điền bằng chứng kiểm chứng thật, xóa các mục không áp dụng. Chỉ tạo PR khi người dùng đồng ý.
