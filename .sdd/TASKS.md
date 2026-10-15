@@ -10,12 +10,12 @@ Trang thai: `todo` | `doing` | `done` | `blocked`
 
 | Task | Noi dung | Trang thai | Ghi chu |
 |---|---|---|---|
-| GO-00 | Repo GitHub moi, bao ve `master`, chuyen `.sdd/` | doing | Code va tai lieu xong; con tao repo tren GitHub, bao ve nhanh, archive repo .NET |
+| GO-00 | Repo GitHub moi, bao ve `master`, chuyen `.sdd/` | blocked | Repo ngoctb61/pharmachat-backend (private) da tao. Bao ve nhanh can GitHub Pro hoac repo public. Archive repo .NET can quyen admin cua NguyenTung309 |
 | GO-01 | Khung code, go.mod, Makefile, golangci-lint | done | |
 | GO-02 | platform: config, slog loc PII, error envelope, request ID, recover | done | |
 | GO-03 | Migration Postgres + pgvector, sqlc, RLS | done | Test RLS chay tren Postgres that |
 | GO-04 | docker-compose: postgres, pcctl, api, agent, caddy | done | Da dung thu: health OK, chi chap nhan TLS 1.3 |
-| GO-05 | CI GitHub Actions | doing | Workflow da viet; chua chay tren GitHub |
+| GO-05 | CI GitHub Actions | done | Lan chay dau tien xanh ca 6 job |
 | GO-06 | pcctl: migrate, seed, create-admin | done | |
 
 ## Giai doan 1..9
