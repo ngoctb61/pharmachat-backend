@@ -62,6 +62,7 @@
 - Squash on merge. PR phai tham chieu SPEC ID (SPEC-01, UC-A07...) hoac task GO-xx.
 - No force-push to `master`.
 - Never `--no-verify`.
+- Tam thoi (tu 2026-10-15): GitHub Free khong cho bao ve nhanh tren repo private, nen cac quy tac tren va Art. 7 duoc giu bang quy trinh, GitHub chua chan. Bat branch protection ngay khi nang cap GitHub Pro.
 
 ---
 

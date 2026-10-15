@@ -10,7 +10,7 @@ Trang thai: `todo` | `doing` | `done` | `blocked`
 
 | Task | Noi dung | Trang thai | Ghi chu |
 |---|---|---|---|
-| GO-00 | Repo GitHub moi, bao ve `master`, chuyen `.sdd/` | blocked | Repo ngoctb61/pharmachat-backend (private) da tao. Bao ve nhanh can GitHub Pro hoac repo public. Archive repo .NET can quyen admin cua NguyenTung309 |
+| GO-00 | Repo GitHub moi, bao ve `master`, chuyen `.sdd/` | done | Repo ngoctb61/pharmachat-backend (private). Quyet dinh 2026-10-15: tam chua bao ve `master` (GitHub Free khong ho tro cho repo private); bat lai khi nang Pro. Archive repo .NET can NguyenTung309 tu lam |
 | GO-01 | Khung code, go.mod, Makefile, golangci-lint | done | |
 | GO-02 | platform: config, slog loc PII, error envelope, request ID, recover | done | |
 | GO-03 | Migration Postgres + pgvector, sqlc, RLS | done | Test RLS chay tren Postgres that |
