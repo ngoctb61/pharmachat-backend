@@ -14,3 +14,6 @@ deploy/.env
 .vscode/
 *.swp
 .DS_Store
+
+# Claude Code personal overrides
+.claude/settings.local.json

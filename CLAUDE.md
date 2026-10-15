@@ -38,11 +38,9 @@ Two Postgres roles matter. The **schema owner** (`DATABASE_ADMIN_URL`, used only
 - `messages`, `agent_traces` and `compliance_logs` are append-only for the app role (no UPDATE/DELETE; `messages` allows UPDATE only on `external_message_id`, `metadata_json`). `permissions` is read-only.
 - The login role is created by `deploy/postgres/10-app-role.sql`, which runs only on first volume init. Tests create it in `internal/platform/dbtest`.
 
-### Conventions specific to this repo
+## Shared Claude Code setup (`.claude/`)
 
-- Client errors use `httpx.Error` and are written with `httpx.WriteError` as `{errorCode, message, requestId}`. User-facing messages are Vietnamese without diacritics. Any other error becomes a 500 `INTERNAL`, with the cause logged server-side only.
-- Never put phone numbers, emails, message text or secrets in log attributes. `logx` redacts known keys and scrubs emails and phone numbers, but don't rely on it.
-- Embeddings are `halfvec(3072)`, because pgvector cannot HNSW-index `vector` above 2000 dims. `embedding_configs.dimension` is pinned to 3072 by a CHECK constraint.
-- LLM model and prices come from `llm_configs` (seeded as `claude-sonnet-4-6`, $3/$15 per MTok). Don't hardcode them.
-- Integration tests use `dbtest.Run` in `TestMain` and call `dbtest.Require(t, env)` so that `-short` skips them.
-- Default branch is `master`. Commits use conventional format and reference a SPEC or GO-xx task.
+- `rules/`: `workflow.md` always applies; `go-code.md` loads for `*.go`; `migrations.md` loads for `migrations/` and `internal/store/queries/`. Coding conventions live there, not here.
+- `skills/`: `/start-task GO-xx`, `/new-migration`, `/verify-stack`.
+- `settings.json`: allowlists routine make/go/git/gh commands. It denies reading `deploy/.env` and editing generated `internal/store/*.go`. Hooks run `gofmt` after Go edits and block force-pushes and pushes to `master` (`hooks/guard-push.sh`), standing in for branch protection, which GitHub Free lacks on private repos.
+- Personal overrides go in `.claude/settings.local.json` (gitignored).
