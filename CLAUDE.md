@@ -44,3 +44,4 @@ Two Postgres roles matter. The **schema owner** (`DATABASE_ADMIN_URL`, used only
 - `skills/`: `/start-task GO-xx`, `/new-migration`, `/verify-stack`.
 - `settings.json`: allowlists routine make/go/git/gh commands. It denies reading `deploy/.env` and editing generated `internal/store/*.go`. Hooks run `gofmt` after Go edits and block force-pushes and pushes to `master` (`hooks/guard-push.sh`), standing in for branch protection, which GitHub Free lacks on private repos.
 - Personal overrides go in `.claude/settings.local.json` (gitignored).
+- `.mcp.json` registers the Atlassian Rovo MCP server (`https://mcp.atlassian.com/v2/mcp`) for Jira and Confluence, and `settings.json` pre-approves it. Each person signs in with their own Atlassian account by running `/mcp` once.
