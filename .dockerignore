@@ -5,3 +5,4 @@ docs
 deploy/.env
 **/*_test.go
 *.md
+.claude
