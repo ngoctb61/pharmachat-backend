@@ -1,13 +1,13 @@
 <!--
 Tiêu đề PR theo conventional commits: <type>(<scope>): <tóm tắt>
-Ví dụ: feat(auth): dang nhap bang email va mat khau (GO-07)
+Ví dụ: feat(auth): dang nhap bang email va mat khau (PHA-21)
 Xóa các mục không áp dụng thay vì để trống.
 -->
 
 ## Task và SPEC
 
-- Task: GO-xx <!-- docs/MIGRATION_GO_BACKEND.md mục 7 -->
-- SPEC: SPEC-0x <!-- .sdd/specs/ -->
+- Task: PHA-n <!-- issue Jira, project PHA -->
+- SPEC: SPEC-0x <!-- Confluence space SD -->
 - Quyết định liên quan: <!-- B-1..B-6 nếu có, hoặc xóa dòng này -->
 
 ## Thay đổi gì và tại sao
@@ -46,7 +46,7 @@ Chi tiết:
 **Hợp đồng và tài liệu**
 
 - [ ] Đổi API public: đã cập nhật `api/openapi.yaml` và báo cho repo frontend
-- [ ] Đã cập nhật trạng thái task trong `.sdd/TASKS.md`
+- [ ] Đã chuyển issue Jira sang In Review và ghi bằng chứng vào comment
 - [ ] PR chạm tới bảo mật (auth, RLS, mã hóa, webhook): cần 2 người review (constitution Art. 7)
 
 ## Ngoài phạm vi

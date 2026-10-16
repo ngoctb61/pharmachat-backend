@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Go backend for PharmaChat, an AI sales and support chatbot for a Vietnamese pharma company (Huyen Song Khoe). Customers reach it through Facebook Messenger and Instagram DM. The frontend lives in a separate repo. It replaces an earlier .NET implementation; `docs/MIGRATION_GO_BACKEND.md` is the implementation plan (tasks GO-00..GO-47) and records the business decisions B-1..B-6. Specs are in `.sdd/` (Vietnamese without diacritics); task status is in `.sdd/TASKS.md`.
+Go backend for PharmaChat, an AI sales and support chatbot for a Vietnamese pharma company (Huyen Song Khoe). Customers reach it through Facebook Messenger and Instagram DM. The frontend lives in a separate repo. It replaces an earlier .NET implementation.
+
+Business docs and task tracking live on Atlassian (`pharmachat.atlassian.net`), not in this repo; read them through the `atlassian` MCP server:
+- Confluence space `SD`, under the page "PharmaChat — Tài liệu dự án": CONTEXT, the constitution, SPEC-01..07, the Go migration plan (which records business decisions B-1..B-6) and the old .NET design document.
+- Jira project `PHA`: one epic per phase (PHA-4..PHA-13) and one issue per original task, titled `GO-xx · ...`. Branches, commits and PRs reference the `PHA-n` key. Jira tickets are written in Vietnamese.
+
+`.sdd/AGENTS.md` stays in the repo as a short context file for AI agents.
 
 ## Commands
 
@@ -41,7 +47,7 @@ Two Postgres roles matter. The **schema owner** (`DATABASE_ADMIN_URL`, used only
 ## Shared Claude Code setup (`.claude/`)
 
 - `rules/`: `workflow.md` always applies; `go-code.md` loads for `*.go`; `migrations.md` loads for `migrations/` and `internal/store/queries/`. Coding conventions live there, not here.
-- `skills/`: `/start-task GO-xx`, `/new-migration`, `/verify-stack`.
+- `skills/`: `/start-task PHA-n` (or a legacy `GO-xx`), `/new-migration`, `/verify-stack`.
 - `settings.json`: allowlists routine make/go/git/gh commands. It denies reading `deploy/.env` and editing generated `internal/store/*.go`. Hooks run `gofmt` after Go edits and block force-pushes and pushes to `master` (`hooks/guard-push.sh`), standing in for branch protection, which GitHub Free lacks on private repos.
 - Personal overrides go in `.claude/settings.local.json` (gitignored).
 - `.mcp.json` registers the Atlassian Rovo MCP server (`https://mcp.atlassian.com/v2/mcp`) for Jira and Confluence, and `settings.json` pre-approves it. Each person signs in with their own Atlassian account by running `/mcp` once.

@@ -1,6 +1,6 @@
 #!/bin/sh
 # PreToolUse (Bash, git push only): stand-in for GitHub branch protection, which
-# GitHub Free does not offer on private repos (.sdd/constitution.md Art. 4).
+# GitHub Free does not offer on private repos (constitution Art. 4, on Confluence).
 # Blocks force pushes and any push that would update master; exit 2 tells Claude why.
 PAYLOAD=$(cat)
 . "$(dirname "$0")/lib.sh"
