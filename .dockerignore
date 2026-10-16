@@ -1,7 +1,5 @@
 .git
 .github
-.sdd
-docs
 deploy/.env
 **/*_test.go
 *.md

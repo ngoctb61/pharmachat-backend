@@ -10,8 +10,6 @@ Business docs and task tracking live on Atlassian (`pharmachat.atlassian.net`), 
 - Confluence space `SD`, under the page "PharmaChat — Tài liệu dự án": CONTEXT, the constitution, SPEC-01..07, the Go migration plan (which records business decisions B-1..B-6) and the old .NET design document.
 - Jira project `PHA`: one epic per phase (PHA-4..PHA-13) and one issue per original task, titled `GO-xx · ...`. Branches, commits and PRs reference the `PHA-n` key. Jira tickets are written in Vietnamese.
 
-`.sdd/AGENTS.md` stays in the repo as a short context file for AI agents.
-
 ## Commands
 
 ```bash
