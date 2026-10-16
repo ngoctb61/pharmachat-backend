@@ -1,7 +1,7 @@
 # AGENTS.md — Context for AI Coding Agents
 
 > PharmaChat backend: AI Agent Chat cho cong ty duoc pham
-> Cap nhat: 2026-10-15 (chuyen sang Go, xem docs/MIGRATION_GO_BACKEND.md)
+> Cap nhat: 2026-10-16 (tai lieu nghiep vu va task chuyen len Confluence/Jira)
 > Path: .sdd/AGENTS.md
 
 ---
@@ -21,14 +21,11 @@ PharmaChat la he thong AI Agent Chat su dung RAG de tu van ban hang 24/7 cho con
 - Real-time: WebSocket + Postgres LISTEN/NOTIFY
 - Deploy: Docker Compose + Caddy (1 VPS 8GB RAM)
 
-## Key Files
+## Key Sources
 
-- .sdd/CONTEXT.md — Business context, cac quyet dinh brainstorming
-- .sdd/constitution.md — Tech stack, coding standards, security policies
-- .sdd/specs/ — 7 SPEC files (EARS notation)
-- .sdd/TASKS.md — Trang thai task GO-xx
-- docs/MIGRATION_GO_BACKEND.md — Ke hoach trien khai Go, cac quyet dinh B-1..B-6
-- docs/DESIGN_DOCUMENT.md — Thiet ke goc (phan kien truc .NET da bi thay the)
+Tai lieu nghiep vu nam tren Atlassian (pharmachat.atlassian.net), doc qua MCP `atlassian`:
+- Confluence space SD, trang "PharmaChat — Tai lieu du an": CONTEXT, Constitution, 7 SPEC (EARS notation), Ke hoach migrate backend sang Go (quyet dinh B-1..B-6), Design Document ban .NET (phan kien truc da bi thay the)
+- Jira project PHA: moi giai doan la mot epic, moi task la mot issue tieu de `GO-xx · ...`
 - migrations/ — Database DDL (source of truth)
 
 ## Coding Rules
@@ -51,23 +48,23 @@ PharmaChat la he thong AI Agent Chat su dung RAG de tu van ban hang 24/7 cho con
 
 ## Task Workflow
 
-1. Pick a task from .sdd/TASKS.md (check dependencies first)
-2. Read the relevant SPEC from .sdd/specs/ va muc tuong ung trong docs/MIGRATION_GO_BACKEND.md
+1. Pick an issue from Jira project PHA (check "is blocked by" links first)
+2. Read the issue, its epic's done condition and the relevant SPEC on Confluence
 3. Write test first (TDD)
 4. Implement
 5. Run `make lint test`
-6. Commit with SPEC / GO-xx reference
+6. Commit with SPEC / PHA-n reference
 
 ## Branch Naming
 
 - Nhanh mac dinh: master
-- feat/<scope> — new features
-- fix/<scope> — bug fixes
+- feat/PHA-n-<scope> — new features
+- fix/PHA-n-<scope> — bug fixes
 - chore/<scope> — maintenance
 
 ## PR Requirements
 
 - CI green (lint + test + sqlc diff + docker build)
 - One human reviewer
-- Linked SPEC ID hoac GO-xx in PR description
+- Linked SPEC ID hoac PHA-n in PR description
 - Updated docs / api/openapi.yaml if public contract changed

@@ -2,10 +2,8 @@
 
 Backend Go cho PharmaChat: chatbot AI tư vấn bán hàng 24/7 cho công ty dược phẩm qua Facebook Messenger và Instagram DM. Frontend nằm ở repo riêng.
 
-- Nghiệp vụ: `.sdd/CONTEXT.md` và `.sdd/specs/`
-- Kế hoạch triển khai và các quyết định: `docs/MIGRATION_GO_BACKEND.md`
-- Trạng thái task: `.sdd/TASKS.md`
-- Quy tắc dự án: `.sdd/constitution.md`
+- Nghiệp vụ, SPEC, quy tắc dự án và kế hoạch triển khai: Confluence space `SD`, trang [PharmaChat — Tài liệu dự án](https://pharmachat.atlassian.net/wiki/spaces/SD/pages/131076)
+- Task và trạng thái: Jira project [PHA](https://pharmachat.atlassian.net/jira/software/projects/PHA/boards), mỗi giai đoạn là một epic
 
 ## Thành phần
 
