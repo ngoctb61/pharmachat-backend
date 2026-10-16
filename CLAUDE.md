@@ -45,7 +45,18 @@ Two Postgres roles matter. The **schema owner** (`DATABASE_ADMIN_URL`, used only
 ## Shared Claude Code setup (`.claude/`)
 
 - `rules/`: `workflow.md` always applies; `go-code.md` loads for `*.go`; `migrations.md` loads for `migrations/` and `internal/store/queries/`. Coding conventions live there, not here.
-- `skills/`: `/start-task PHA-n` (or a legacy `GO-xx`), `/new-migration`, `/verify-stack`.
+- `skills/`: `/start-task PHA-n` (or a legacy `GO-xx`), `/review-task`, `/fix-review`, `/new-migration`, `/verify-stack`.
+- `agents/`: three personas. `aarch` (software architect) writes the plan; `aeng` (principal engineer) is the role the main session takes to implement; `asec` (security engineer). All three review as read-only subagents.
 - `settings.json`: allowlists routine make/go/git/gh commands. It denies reading `deploy/.env` and editing generated `internal/store/*.go`. Hooks run `gofmt` after Go edits and block force-pushes and pushes to `master` (`hooks/guard-push.sh`), standing in for branch protection, which GitHub Free lacks on private repos.
+
+### Task flow
+
+Each task runs in its own git worktree `.claude/worktrees/PHA-n` (gitignored) on branch `feat/PHA-n-<scope>`. Its working docs go in `ticketed/PHA-n/` and are committed with the branch: `plan.md`, optional `decision-NN-<slug>.md`, `summary.md`, `review-<YYYYMMDD-HHMM>.md`.
+
+1. `/start-task PHA-n`: creates the worktree, `aarch` writes `plan.md`, the session stops.
+2. The user types `approve`. `hooks/plan-approve.sh` writes `ticketed/PHA-n/.approved` (the plan's SHA-256). `hooks/plan-gate.sh` blocks Write/Edit of files outside `ticketed/` in that worktree until then, and again if the plan changes after approval.
+3. The session implements as `aeng`, writes `summary.md` and points the user to review.
+4. `/review-task` in a new session opened in the worktree: `aarch`, `aeng` and `asec` review the diff in parallel; findings are verified, graded Blocker / Major / Minor / Nit / Question and written to `review-*.md` with a decision box each.
+5. The user marks decisions; `/fix-review` in the implement session fixes the ones marked "sửa" and appends to `summary.md`.
 - Personal overrides go in `.claude/settings.local.json` (gitignored).
 - `.mcp.json` registers the Atlassian Rovo MCP server (`https://mcp.atlassian.com/v2/mcp`) for Jira and Confluence, and `settings.json` pre-approves it. Each person signs in with their own Atlassian account by running `/mcp` once.

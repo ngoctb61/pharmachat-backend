@@ -7,6 +7,7 @@ Xóa các mục không áp dụng thay vì để trống.
 ## Task và SPEC
 
 - Task: PHA-n <!-- issue Jira, project PHA -->
+- Plan và review: `ticketed/PHA-n/` <!-- plan.md đã duyệt, review-*.md -->
 - SPEC: SPEC-0x <!-- Confluence space SD -->
 - Quyết định liên quan: <!-- B-1..B-6 nếu có, hoặc xóa dòng này -->
 

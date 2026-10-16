@@ -31,13 +31,26 @@
     "deny": [
       "Read(./deploy/.env)",
       "Read(./.env)",
+      "Read(**/deploy/.env)",
       "Edit(./internal/store/*.go)",
+      "Edit(**/internal/store/*.go)",
       "Bash(git push --force *)",
       "Bash(git push -f *)",
       "Bash(git push *master*)"
     ]
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/plan-approve.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -45,6 +58,16 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-push.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/plan-gate.sh",
             "timeout": 10
           }
         ]

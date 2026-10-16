@@ -17,3 +17,6 @@ deploy/.env
 
 # Claude Code personal overrides
 .claude/settings.local.json
+
+# Task worktrees created by /start-task (each is its own checkout)
+.claude/worktrees/
