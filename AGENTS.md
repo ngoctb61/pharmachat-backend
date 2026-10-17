@@ -14,7 +14,9 @@ Claude Code applies these files automatically. Read them before working in the m
 | `.claude/rules/go-code.md` | Editing any `*.go` file |
 | `.claude/rules/migrations.md` | Editing `migrations/`, `internal/store/queries/` or `sqlc.yaml` |
 
-`.claude/skills/*/SKILL.md` describe step-by-step procedures (`start-task`, `new-migration`, `verify-stack`). Follow the matching one by hand when doing that kind of work.
+`.claude/skills/*/SKILL.md` describe step-by-step procedures (`start-task`, `review-task`, `fix-review`, `new-migration`, `verify-stack`). Follow the matching one by hand when doing that kind of work. The personas they use are in `.claude/agents/` (`aarch`, `aeng`, `asec`).
+
+Task work keeps its plan, decisions, summary and reviews in `ticketed/PHA-n/`, committed with the branch. Do not change code for a task until the user has approved `ticketed/PHA-n/plan.md`; in Claude Code a hook enforces this, for you it is a rule.
 
 ## Guards that only exist for Claude Code
 
