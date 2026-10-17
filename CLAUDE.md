@@ -56,7 +56,7 @@ Each task runs in its own git worktree `.claude/worktrees/PHA-n` (gitignored) on
 1. `/start-task PHA-n`: creates the worktree, `aarch` writes `plan.md`, the session stops.
 2. The user types `approve`. `hooks/plan-approve.sh` writes `ticketed/PHA-n/.approved` (the plan's SHA-256). `hooks/plan-gate.sh` blocks Write/Edit of files outside `ticketed/` in that worktree until then, and again if the plan changes after approval.
 3. The session implements as `aeng`, writes `summary.md` and points the user to review.
-4. `/review-task` in a new session opened in the worktree: `aarch`, `aeng` and `asec` review the diff in parallel; findings are verified, graded Blocker / Major / Minor / Nit / Question and written to `review-*.md` with a decision box each.
+4. `/review-task`, in the same session or (to keep the implementation context out of it) a new one opened in the worktree: `aarch`, `aeng` and `asec` review the diff in parallel; findings are verified, graded Blocker / Major / Minor / Nit / Question and written to `review-*.md` with a decision box each.
 5. The user marks decisions; `/fix-review` in the implement session fixes the ones marked "sửa" and appends to `summary.md`.
 - Personal overrides go in `.claude/settings.local.json` (gitignored).
 - `.mcp.json` registers the Atlassian Rovo MCP server (`https://mcp.atlassian.com/v2/mcp`) for Jira and Confluence, and `settings.json` pre-approves it. Each person signs in with their own Atlassian account by running `/mcp` once.

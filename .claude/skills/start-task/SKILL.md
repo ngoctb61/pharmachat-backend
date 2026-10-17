@@ -5,7 +5,7 @@ description: Bắt đầu hoặc tiếp tục một task theo issue Jira (ví d�
 
 # Bắt đầu task
 
-Quy trình: **aarch lên plan → người dùng gõ `approve` → aeng implement → người dùng mở session mới chạy `/review-task` → `/fix-review`.**
+Quy trình: **aarch lên plan → người dùng gõ `approve` → aeng implement → `/review-task` → `/fix-review`.**
 
 Dữ liệu nghiệp vụ nằm trên Atlassian (site `pharmachat.atlassian.net`), đọc và ghi qua MCP `atlassian`:
 - Task: Jira project `PHA`. Mỗi giai đoạn là một epic; issue con có tiêu đề `GO-xx · ...`. Phụ thuộc giữa các giai đoạn là link "blocks".
@@ -82,7 +82,7 @@ Nhập vai **aeng**: đọc `.claude/agents/aeng.md` và làm theo phần "Khi i
    ```
 2. Commit `summary.md`.
 3. Báo người dùng bằng tóm tắt ngắn và bước tiếp theo:
-   > Mở **session mới** để review độc lập: `cd .claude/worktrees/PHA-n && claude`, rồi chạy `/review-task`.
+   > Chạy `/review-task` để review. Chạy ngay ở session này được; muốn review không bị ảnh hưởng bởi context lúc implement thì mở session mới: `cd .claude/worktrees/PHA-n && claude`, rồi chạy `/review-task`.
 
 ## 6. Sau review
 

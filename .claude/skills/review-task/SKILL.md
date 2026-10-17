@@ -1,13 +1,13 @@
 ---
 name: review-task
-description: Review thay đổi của một task PHA-n bằng ba persona aarch, aeng, asec chạy song song, rồi ghi ticketed/PHA-n/review-<YYYYMMDD-HHMM>.md với các finding chia theo mức Blocker, Major, Minor, Nit, Question. Chạy trong một session mới mở ở worktree .claude/worktrees/PHA-n, không phải session đã implement. Dùng khi người dùng gõ "/review-task" hoặc muốn review task đang làm.
+description: Review thay đổi của một task PHA-n bằng ba persona aarch, aeng, asec chạy song song, rồi ghi ticketed/PHA-n/review-<YYYYMMDD-HHMM>.md với các finding chia theo mức Blocker, Major, Minor, Nit, Question. Chạy trong worktree .claude/worktrees/PHA-n, ở session đang làm hoặc một session mới (khuyến nghị, để không bị ảnh hưởng bởi context lúc implement). Dùng khi người dùng gõ "/review-task" hoặc muốn review task đang làm.
 ---
 
 # Review task
 
-Session này chỉ **đọc và ghi file review**: không sửa code, không commit, không push, không chuyển trạng thái Jira. Việc sửa thuộc về session implement qua `/fix-review`.
+Skill này chỉ **đọc và ghi file review**: không sửa code, không commit, không push, không chuyển trạng thái Jira. Việc sửa thuộc về `/fix-review`.
 
-Review dựa trên **diff, plan và issue/SPEC**, không dựa trên lịch sử chat lúc implement. Vì vậy nên chạy trong session mới. Nếu session này chính là session đã implement task, báo người dùng và đề nghị mở session mới trước khi tiếp tục.
+Review dựa trên **diff, plan và issue/SPEC**, không dựa trên lịch sử chat lúc implement. Chạy được ngay trong session đang làm; chạy ở session mới chỉ là cách để chắc chắn không bị ảnh hưởng bởi context lúc implement. Ba persona luôn chạy dạng subagent với context riêng, nhưng bước kiểm chứng và chấm mức (mục 3) do session hiện tại làm. Vì vậy nếu chạy trong session đã implement, chỉ dựa vào code và tài liệu, không dùng những gì "đã biết" từ lúc implement để bỏ qua hay hạ mức một finding.
 
 ## 1. Xác định task và thu thập đầu vào
 
@@ -45,7 +45,7 @@ Với từng finding nhận về:
 
 ## 4. Ghi file review
 
-Ghi `ticketed/PHA-n/review-<YYYYMMDD-HHMM>.md` (giờ địa phương, `date +%Y%m%d-%H%M`). Không commit; session implement sẽ commit cùng các bản sửa.
+Ghi `ticketed/PHA-n/review-<YYYYMMDD-HHMM>.md` (giờ địa phương, `date +%Y%m%d-%H%M`). Không commit; `/fix-review` sẽ commit cùng các bản sửa.
 
 ```markdown
 # Review PHA-n · <YYYY-MM-DD HH:MM>
@@ -93,4 +93,4 @@ Bỏ các mục không có finding, nhưng giữ bảng số lượng.
 ## 5. Báo người dùng
 
 Trả lời ngắn: bảng số lượng theo mức, đường dẫn file review, và bước tiếp theo:
-> Mở file review, đánh dấu **Quyết định** cho từng finding (trả lời các Question), rồi quay lại session implement và chạy `/fix-review`.
+> Mở file review, đánh dấu **Quyết định** cho từng finding (trả lời các Question), rồi chạy `/fix-review` trong session implement.

@@ -39,5 +39,5 @@ Sau khi sửa hết: `make lint` và `make test` phải sạch. Commit theo conv
 ## 4. Bước tiếp theo
 
 Báo người dùng số finding đã sửa, hoãn, bỏ qua, rồi đề xuất một trong hai:
-- còn Blocker/Major vừa sửa đáng kể: review lại bằng `/review-task` ở session review (tạo file `review-*.md` mới);
+- còn Blocker/Major vừa sửa đáng kể: review lại bằng `/review-task` (tạo file `review-*.md` mới);
 - không còn Blocker/Major mở: push nhánh và tạo PR theo bước 6 của `/start-task` (chỉ khi người dùng đồng ý).
