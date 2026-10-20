@@ -21,6 +21,7 @@ type API struct {
 	Common
 	HTTPAddr        string        `env:"API_HTTP_ADDR" envDefault:":8080"`
 	DatabaseURL     string        `env:"DATABASE_URL,notEmpty"`
+	JWTSigningKey   string        `env:"JWT_SIGNING_KEY,notEmpty"`
 	ShutdownTimeout time.Duration `env:"SHUTDOWN_TIMEOUT" envDefault:"15s"`
 }
 

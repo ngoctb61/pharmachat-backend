@@ -1,0 +1,14 @@
+# Quyết định 04 · Claim role trong JWT
+- Bối cảnh:
+  - Issue ghi JWT chứa `role`; SPEC-01 §3 ghi "role claims".
+  - Dữ liệu là quan hệ nhiều-nhiều (`user_roles`): một user có thể có 0, 1 hoặc nhiều role. Seed tạo hai role `Admin` và `Sale`.
+  - FE-06 hiện route theo role trong JWT. PHA-23 sẽ dựng middleware quyền.
+- Các phương án:
+  - A. `role: string`, lấy một role. Ưu: đúng nguyên văn issue. Nhược: user có nhiều role thì phải chọn tùy ý một role và làm mất thông tin; có thể phải thêm ràng buộc "mỗi user một role" mà SPEC không yêu cầu.
+  - B. `roles: string[]` gồm tên mọi role. Ưu: khớp mô hình dữ liệu; đủ thông tin cho FE và PHA-23. Nhược: tên khác chữ `role` trong issue.
+  - C. Đưa cả danh sách permission vào token. Nhược: quyết định thay PHA-23 (lấy quyền từ token hay từ DB); token dài hơn; đổi quyền thì phải chờ token hết hạn mới có hiệu lực.
+- Chọn: B. Claim: `user_id` (uuid dạng chuỗi), `tenant_id` (uuid dạng chuỗi), `roles` (mảng tên role theo thứ tự chữ cái), `iat`, `exp` (= `iat` + 15 phút, NFR-02), `iss` = `"pharmachat-api"`. Ký bằng HS256. `Parse` chỉ chấp nhận HS256, bắt buộc có `exp` và `iss` phải bằng `"pharmachat-api"` (góp ý asec).
+  - User có 0 role vẫn đăng nhập được, với `roles: []`. Việc chặn truy cập là của middleware quyền ở PHA-23.
+- Hệ quả:
+  - `user.roles` trong body login dùng cùng danh sách.
+  - Nếu người dùng muốn giữ đúng chữ `role`, sửa `Claims` và spec trước khi merge, không tốn thêm việc gì khác.

@@ -16,6 +16,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/ngoctb61/pharmachat-backend/internal/auth"
 	"github.com/ngoctb61/pharmachat-backend/internal/platform/config"
 	"github.com/ngoctb61/pharmachat-backend/internal/platform/db"
 	"github.com/ngoctb61/pharmachat-backend/internal/platform/health"
@@ -50,15 +51,23 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	tokens, err := auth.NewTokenIssuer([]byte(cfg.JWTSigningKey), time.Now)
+	if err != nil {
+		return err
+	}
 	pool, err := db.Open(ctx, cfg.DatabaseURL)
 	if err != nil {
 		return err
 	}
 	defer pool.Close()
+	authSvc, err := auth.NewService(pool, tokens)
+	if err != nil {
+		return err
+	}
 
 	srv := &http.Server{
 		Addr:              cfg.HTTPAddr,
-		Handler:           newRouter(log, pool),
+		Handler:           newRouter(routerDeps{log: log, pool: pool, auth: auth.NewHandler(authSvc, log)}),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 	errCh := make(chan error, 1)
@@ -83,16 +92,24 @@ func run() error {
 	return nil
 }
 
-func newRouter(log *slog.Logger, pool *pgxpool.Pool) http.Handler {
+type routerDeps struct {
+	log  *slog.Logger
+	pool *pgxpool.Pool
+	auth *auth.Handler
+}
+
+// newRouter mounts every route. Routes under /api must match api/openapi.yaml.
+func newRouter(d routerDeps) http.Handler {
 	r := chi.NewRouter()
-	r.Use(httpx.RequestID, httpx.Recoverer(log), httpx.AccessLog(log))
+	r.Use(httpx.RequestID, httpx.Recoverer(d.log), httpx.AccessLog(d.log))
 	r.NotFound(func(w http.ResponseWriter, req *http.Request) {
-		httpx.WriteError(w, req, log, httpx.ErrNotFound)
+		httpx.WriteError(w, req, d.log, httpx.ErrNotFound)
 	})
 	r.MethodNotAllowed(func(w http.ResponseWriter, req *http.Request) {
-		httpx.WriteError(w, req, log, &httpx.Error{Status: http.StatusMethodNotAllowed, Code: "METHOD_NOT_ALLOWED", Message: "Phuong thuc khong duoc ho tro"})
+		httpx.WriteError(w, req, d.log, &httpx.Error{Status: http.StatusMethodNotAllowed, Code: "METHOD_NOT_ALLOWED", Message: "Phuong thuc khong duoc ho tro"})
 	})
-	r.Method(http.MethodGet, "/health", health.Handler(map[string]health.Check{"postgres": pool.Ping}))
+	r.Method(http.MethodGet, "/health", health.Handler(map[string]health.Check{"postgres": d.pool.Ping}))
+	r.Post("/api/auth/login", d.auth.Login)
 	return r
 }
 

@@ -57,6 +57,7 @@ services:
     mem_limit: 256m
     environment:
       <<: *service-env
+      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY:?set JWT_SIGNING_KEY in deploy/.env}
     depends_on:
       pcctl: { condition: service_completed_successfully }
     healthcheck:

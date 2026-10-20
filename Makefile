@@ -1,7 +1,8 @@
 GOLANGCI_VERSION := v2.14.0
+REDOCLY_VERSION := 2.57.0
 COMPOSE := docker compose -f deploy/docker-compose.yml
 
-.PHONY: build test test-unit lint gen gen-check up down logs migrate seed create-admin
+.PHONY: build test test-unit lint lint-api gen gen-check up down logs migrate seed create-admin
 
 build:
 	go build ./...
@@ -21,6 +22,10 @@ lint:
 	else \
 		docker run --rm -v "$(CURDIR)":/src -w /src golangci/golangci-lint:$(GOLANGCI_VERSION) golangci-lint run ./...; \
 	fi
+
+# Lints the API contract api/openapi.yaml (CI runs the same image).
+lint-api:
+	docker run --rm -v "$(CURDIR)/api":/spec -w /spec redocly/cli:$(REDOCLY_VERSION) lint openapi.yaml
 
 # Regenerate sqlc code after editing migrations/ or internal/store/queries/.
 gen:
