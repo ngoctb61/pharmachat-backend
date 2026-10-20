@@ -1,0 +1,14 @@
+# Quyết định 01 · Response login trả gì khi refresh token thuộc PHA-22
+- Bối cảnh:
+  - SPEC-01 §4 ghi login trả `{ token, refreshToken, user }`. Nhưng §5 của chính SPEC-01 yêu cầu refresh token nằm trong cookie httpOnly Secure.
+  - Kế hoạch frontend mục 4 (đã chốt 2026-10-18) ghi: access token trong body, refresh token trong cookie `SameSite=Strict; Path=/api/auth`.
+  - PHA-22 nhận phần "refresh token xoay vòng, lưu dạng hash, cookie httpOnly". PHA-21 chỉ có login, argon2id, khóa tài khoản, JWT.
+- Các phương án:
+  - A. PHA-21 cũng phát refresh token và đặt cookie. Ưu: FE-05 có đủ luồng ngay. Nhược: làm lấn sang PHA-22 (bảng `refresh_tokens`, cách băm, chính sách cookie), hai issue sửa chung một đoạn code.
+  - B. PHA-21 trả `{ token, user }`, chưa có cookie. PHA-22 thêm `Set-Cookie` vào login và sửa `/api/auth/login` trong spec. Ưu: ranh giới đúng issue, review gọn. Nhược: trong khoảng giữa hai PR, FE chỉ đăng nhập được, chưa refresh được.
+  - C. Đưa `refreshToken` vào body như SPEC §4. Nhược: trái với SPEC §5 và quyết định frontend đã chốt; token đọc được bằng JavaScript.
+- Chọn: B. Ranh giới khớp với các issue, không trái với điều gì đã chốt. FE-05 vẫn cần cả GO-07 và GO-08 trước khi đóng, nên khoảng giữa hai PR không chặn ai.
+- Hệ quả:
+  - Body 200 có dạng `{ "token": string, "user": { "id", "tenantId", "displayName", "email", "roles": string[] } }`, tên trường camelCase như envelope lỗi.
+  - Không có `refreshToken` trong body, kể cả sau PHA-22.
+  - PHA-22 phải thêm header `Set-Cookie` vào response 200 của `/api/auth/login` trong `api/openapi.yaml`.
