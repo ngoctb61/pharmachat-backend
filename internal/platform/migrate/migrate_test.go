@@ -34,11 +34,26 @@ func TestUpDownUp(t *testing.T) {
 		WHERE attrelid = 'kb_chunks'::regclass AND attname = 'embedding'`).Scan(&dims))
 	assert.Equal(t, 3072, dims, "kb_chunks.embedding must be halfvec(3072)")
 
+	assert.True(t, loginCandidateExists(t, env))
+	assert.True(t, tableExists(t, env, "ux_users_email_active"))
+
+	// Down rolls back only the newest migration.
 	require.NoError(t, migrate.Down(ctx, env.Owner, log))
-	assert.False(t, tableExists(t, env, "kb_chunks"))
+	assert.False(t, loginCandidateExists(t, env))
+	assert.False(t, tableExists(t, env, "ux_users_email_active"))
+	assert.True(t, tableExists(t, env, "kb_chunks"))
 
 	require.NoError(t, migrate.Up(ctx, env.Owner, log))
-	assert.True(t, tableExists(t, env, "kb_chunks"))
+	assert.True(t, loginCandidateExists(t, env))
+	assert.True(t, tableExists(t, env, "ux_users_email_active"))
+}
+
+func loginCandidateExists(t *testing.T, env *dbtest.Env) bool {
+	t.Helper()
+	var ok bool
+	require.NoError(t, env.Owner.QueryRow(context.Background(),
+		"SELECT to_regprocedure('public.auth_login_candidate(text)') IS NOT NULL").Scan(&ok))
+	return ok
 }
 
 func tableExists(t *testing.T, env *dbtest.Env, name string) bool {

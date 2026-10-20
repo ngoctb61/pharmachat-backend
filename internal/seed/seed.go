@@ -177,8 +177,9 @@ func seedEmbedding(ctx context.Context, q *store.Queries, tenantID uuid.UUID, op
 	return "created", nil
 }
 
-// ErrUserExists means the email is already registered in the tenant.
-var ErrUserExists = errors.New("a user with this email already exists in the tenant")
+// ErrUserExists means the email is already registered. Emails are unique across
+// tenants, because login identifies the user by email alone.
+var ErrUserExists = errors.New("a user with this email already exists")
 
 // AdminInput describes the admin account to create.
 type AdminInput struct {
