@@ -32,6 +32,13 @@ jobs:
       - name: go.mod is tidy
         run: go mod tidy -diff
 
+  openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: lint api/openapi.yaml
+        run: make lint-api
+
   test:
     runs-on: ubuntu-latest
     steps:

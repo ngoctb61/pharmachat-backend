@@ -1,0 +1,179 @@
+openapi: 3.1.0
+info:
+  title: PharmaChat API
+  version: 0.1.0
+  description: |
+    Public HTTP API of the PharmaChat backend. Every PR that adds or changes an
+    endpoint updates this file in the same PR; `cmd/api/openapi_test.go` fails when
+    the routes the server mounts and the paths documented here differ.
+
+    Errors use one envelope, `{errorCode, message, requestId}`. `message` is
+    Vietnamese, shown to users as is; clients branch on `errorCode`.
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+servers:
+  - url: /
+# Every operation needs a bearer token unless it says `security: []`.
+security:
+  - bearerAuth: []
+tags:
+  - name: auth
+    description: Login and tokens.
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [auth]
+      operationId: login
+      summary: Log in with email and password
+      description: |
+        Returns a 15-minute access token. Send it as `Authorization: Bearer <token>`.
+
+        A 401 here means wrong credentials, not an expired token: clients must not
+        try to refresh in response to a 401 from any `/api/auth/*` route.
+
+        Five wrong passwords in a row lock the account for 15 minutes. While locked,
+        every attempt returns 403 `ACCOUNT_LOCKED` without checking the password.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Logged in.
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: '`VALIDATION_ERROR`: body is not JSON, is over 4 KiB, or lacks `email` or `password`.'
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: '`INVALID_CREDENTIALS`: unknown email or wrong password. The two are indistinguishable.'
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: |
+            - `ACCOUNT_LOCKED`: too many wrong passwords; try again later.
+            - `ACCOUNT_DISABLED`: correct password, but the account is disabled.
+            - `TENANT_INACTIVE`: correct password, but the business is inactive.
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/Internal'
+        '503':
+          description: '`SERVICE_BUSY`: too many logins in progress; retry shortly.'
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestID'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        HS256 access token from `/api/auth/login`, valid 15 minutes. Claims:
+        `user_id`, `tenant_id`, `roles` (role names), `iat`, `exp`, `iss` = `pharmachat-api`.
+
+  headers:
+    RequestID:
+      description: Request ID, also in the error envelope. Quote it when reporting a problem.
+      schema:
+        type: string
+
+  responses:
+    Internal:
+      description: '`INTERNAL`: unexpected server error. Details are logged server-side only.'
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestID'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          description: Case and surrounding spaces are ignored.
+          examples: [admin@example.com]
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+          description: Access token (JWT), valid 15 minutes.
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      required: [id, tenantId, displayName, email, roles]
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          description: Role names, sorted. May be empty.
+          items:
+            type: string
+          examples: [[Admin]]
+
+    Error:
+      type: object
+      required: [errorCode, message, requestId]
+      properties:
+        errorCode:
+          type: string
+          examples: [INVALID_CREDENTIALS]
+        message:
+          type: string
+          description: Vietnamese, shown to the user as is.
+        requestId:
+          type: string

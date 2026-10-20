@@ -20,7 +20,7 @@ Hạ tầng: PostgreSQL 17 + pgvector (dữ liệu, vector, hàng đợi job Riv
 Cần Go (phiên bản trong `go.mod`) và Docker.
 
 ```bash
-cp deploy/.env.example deploy/.env    # điền mật khẩu và ENCRYPTION_KEY theo hướng dẫn trong file
+cp deploy/.env.example deploy/.env    # điền mật khẩu, ENCRYPTION_KEY và JWT_SIGNING_KEY theo hướng dẫn trong file
 make up                               # build và chạy toàn bộ; migration tự chạy trước api/agent
 make seed                             # tạo tenant Huyền Sống Khỏe, role Admin/Sale, cấu hình AI
 make create-admin EMAIL=admin@example.com NAME="Quan tri"

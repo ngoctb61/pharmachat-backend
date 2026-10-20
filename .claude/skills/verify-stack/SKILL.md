@@ -16,6 +16,7 @@ Cần Docker và cổng 80, 443 còn trống. Nếu `deploy/.env` đã tồn t�
    OWNER_DB_PASSWORD=$(openssl rand -hex 24)
    APP_DB_PASSWORD=$(openssl rand -hex 24)
    ENCRYPTION_KEY=$(openssl rand -base64 32)
+   JWT_SIGNING_KEY=$(openssl rand -base64 48)
    EOF
    ```
 
