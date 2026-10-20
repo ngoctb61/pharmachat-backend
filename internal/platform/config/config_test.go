@@ -9,6 +9,7 @@ import (
 )
 
 func TestLoadRequiresDatabaseURL(t *testing.T) {
+	t.Setenv("JWT_SIGNING_KEY", "a-signing-key-of-at-least-32-bytes")
 	t.Setenv("DATABASE_URL", "")
 	_, err := Load[API]()
 	assert.Error(t, err)
@@ -18,6 +19,18 @@ func TestLoadRequiresDatabaseURL(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, ":8080", cfg.HTTPAddr)
 	assert.Equal(t, "info", cfg.LogLevel)
+}
+
+func TestLoadRequiresJWTSigningKey(t *testing.T) {
+	t.Setenv("DATABASE_URL", "postgres://x")
+	t.Setenv("JWT_SIGNING_KEY", "")
+	_, err := Load[API]()
+	assert.ErrorContains(t, err, "JWT_SIGNING_KEY")
+
+	t.Setenv("JWT_SIGNING_KEY", "a-signing-key-of-at-least-32-bytes")
+	cfg, err := Load[API]()
+	require.NoError(t, err)
+	assert.Equal(t, "a-signing-key-of-at-least-32-bytes", cfg.JWTSigningKey)
 }
 
 func TestDecodeKey(t *testing.T) {
