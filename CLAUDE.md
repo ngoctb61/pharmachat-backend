@@ -45,9 +45,10 @@ Two Postgres roles matter. The **schema owner** (`DATABASE_ADMIN_URL`, used only
 ## Shared Claude Code setup (`.claude/`)
 
 - `rules/`: `workflow.md` always applies; `go-code.md` loads for `*.go`; `migrations.md` loads for `migrations/` and `internal/store/queries/`. Coding conventions live there, not here.
-- `skills/`: `/start-task PHA-n` (or a legacy `GO-xx`), `/review-task`, `/fix-review`, `/new-migration`, `/verify-stack`.
+- `skills/`: `/start-task PHA-n` (or a legacy `GO-xx`), `/review-task`, `/fix-review`, `/finish-task`, `/new-migration`, `/verify-stack`.
 - `agents/`: three personas. `aarch` (software architect) writes the plan; `aeng` (principal engineer) is the role the main session takes to implement; `asec` (security engineer). All three review as read-only subagents.
 - `settings.json`: allowlists routine make/go/git/gh commands. It denies reading `deploy/.env` and editing generated `internal/store/*.go`. Hooks run `gofmt` after Go edits and block force-pushes and pushes to `master` (`hooks/guard-push.sh`), standing in for branch protection, which GitHub Free lacks on private repos.
+- Hooks run from the main checkout's `.claude/` (`$CLAUDE_PROJECT_DIR`), not from the worktree a session is in, so a hook change takes effect only after it is merged and the main checkout pulls `master`. A session inside a worktree cannot run git against the main checkout; it leaves with `ExitWorktree` (`keep`) and comes back with `EnterWorktree` (`path`).
 
 ### Task flow
 
@@ -55,8 +56,12 @@ Each task runs in its own git worktree `.claude/worktrees/PHA-n` (gitignored) on
 
 1. `/start-task PHA-n`: creates the worktree, `aarch` writes `plan.md`, the session stops.
 2. The user types `approve`. `hooks/plan-approve.sh` writes `ticketed/PHA-n/.approved` (the plan's SHA-256). `hooks/plan-gate.sh` blocks Write/Edit of files outside `ticketed/` in that worktree until then, and again if the plan changes after approval.
-3. The session implements as `aeng`, writes `summary.md` and points the user to review.
+3. The session implements as `aeng`, writes `summary.md` and points the user to review. Small deviations from the plan are made and recorded in `summary.md`; contract, schema, approach or scope changes stop for the user (`agents/aeng.md`).
 4. `/review-task`, in the same session or (to keep the implementation context out of it) a new one opened in the worktree: `aarch`, `aeng` and `asec` review the diff in parallel; findings are verified, graded Blocker / Major / Minor / Nit / Question and written to `review-*.md` with a decision box each.
 5. The user marks decisions; `/fix-review` in the implement session fixes the ones marked "sửa" and appends to `summary.md`.
+6. The PR can be opened before or after review, whenever the user asks. It is ready to merge once at least one review round has run with no open Blocker or Major.
+7. After merge, `/finish-task` moves the issue to Done, pulls `master` in the main checkout and removes the worktree and branches.
+
+`/review-task PHA-x` (or a PR number or link) also reviews a colleague's PR. It checks the PR out into a detached worktree `.claude/worktrees/review-pr-<N>`, reads the Jira issue and the PR diff, writes the review there and posts it to the PR only if the user agrees.
 - Personal overrides go in `.claude/settings.local.json` (gitignored).
 - `.mcp.json` registers the Atlassian Rovo MCP server (`https://mcp.atlassian.com/v2/mcp`) for Jira and Confluence, and `settings.json` pre-approves it. Each person signs in with their own Atlassian account by running `/mcp` once.

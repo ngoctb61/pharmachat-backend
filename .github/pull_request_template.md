@@ -24,6 +24,7 @@ Xóa các mục không áp dụng thay vì để trống.
 - [ ] `make lint` sạch
 - [ ] `make test` pass (gồm test tích hợp)
 - [ ] Đã dựng stack thật bằng `/verify-stack` <!-- chỉ khi đổi hạ tầng, Dockerfile, compose, Caddy hoặc endpoint -->
+- [ ] Đã chạy `/review-task`, không còn finding Blocker hay Major chưa xử lý <!-- PR mở trước review thì để trống, đánh dấu khi review xong -->
 
 Chi tiết:
 

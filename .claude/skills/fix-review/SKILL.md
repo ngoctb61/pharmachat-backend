@@ -34,10 +34,12 @@ Sau khi sửa hết: `make lint` và `make test` phải sạch. Commit theo conv
    ```
 2. Không sửa nội dung file review, ngoài việc giữ nguyên các dấu người dùng đã đánh.
 3. Commit file review và `summary.md`: `docs(ticketed): record review fixes (PHA-n)`.
-4. Finding `hoãn` mà là lỗi đã tái hiện được: hỏi người dùng có tạo issue Jira (tiếng Việt) cho nó không. Không tự tạo.
+4. Nếu nhánh đã có PR (`gh pr view --json url,state`), push để PR cập nhật (`git push`, không force).
+5. Finding `hoãn` mà là lỗi đã tái hiện được: hỏi người dùng có tạo issue Jira (tiếng Việt) cho nó không. Không tự tạo.
 
 ## 4. Bước tiếp theo
 
-Báo người dùng số finding đã sửa, hoãn, bỏ qua, rồi đề xuất một trong hai:
+Báo người dùng số finding đã sửa, hoãn, bỏ qua, rồi đề xuất một trong các bước:
 - còn Blocker/Major vừa sửa đáng kể: review lại bằng `/review-task` (tạo file `review-*.md` mới);
-- không còn Blocker/Major mở: push nhánh và tạo PR theo bước 6 của `/start-task` (chỉ khi người dùng đồng ý).
+- không còn Blocker/Major mở và chưa có PR: push nhánh và tạo PR theo bước 6 của `/start-task` (chỉ khi người dùng đồng ý);
+- không còn Blocker/Major mở và đã có PR: cập nhật mô tả PR là đã review xong, báo PR sẵn sàng merge (bước 6 của `/start-task`).
