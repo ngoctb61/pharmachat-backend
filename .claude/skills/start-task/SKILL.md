@@ -34,13 +34,13 @@ Nếu `.claude/worktrees/PHA-n` đã tồn tại thì đây là **tiếp tục t
 
 ## 1. Đọc yêu cầu và tạo worktree
 
-1. Đọc mô tả issue, điều kiện xong và các link "is blocked by" của epic cha (`getJiraIssue` với `view: "evidence"`). Nếu epic chặn epic cha chưa Done, hoặc issue có link "is blocked by" chưa xong, **dừng lại và báo**.
+1. Đọc mô tả issue, điều kiện xong của epic cha và các link chặn (`getJiraIssue` với `view: "evidence"` cho cả issue lẫn epic cha). Chỉ xét link chiều vào "is blocked by": trong `issuelinks` đó là mục có `inwardIssue`. Mục có `outwardIssue` ("blocks") là issue này chặn issue khác, không làm nó bị chặn. Nếu một `inwardIssue` của epic cha hoặc của issue chưa Done, **dừng lại và báo**.
 2. Tạo worktree từ `master` mới nhất (ở thư mục repo chính):
    ```bash
    git fetch origin
-   git worktree add .claude/worktrees/PHA-n -b feat/PHA-n-<scope> origin/master
+   git worktree add --no-track .claude/worktrees/PHA-n -b feat/PHA-n-<scope> origin/master
    ```
-   Dùng `fix/` thay `feat/` nếu là sửa lỗi.
+   Dùng `fix/` thay `feat/` nếu là sửa lỗi. Phải có `--no-track`: thiếu nó thì nhánh mới lấy `origin/master` làm upstream, nên `git status`/`git pull` so với master. Upstream đúng được đặt lúc push lần đầu (`git push -u origin feat/PHA-n-<scope>`).
 3. Nếu repo chính có `deploy/.env` (kiểm tra bằng `test -e`, **không đọc**), tạo symlink để `make up` chạy được trong worktree: `ln -s ../../../../deploy/.env .claude/worktrees/PHA-n/deploy/.env`.
 4. Chuyển session vào worktree bằng tool `EnterWorktree` với `path` là `.claude/worktrees/PHA-n`. Từ đây mọi lệnh và mọi file đều trong worktree.
 5. Chuyển issue sang **In Progress**.
